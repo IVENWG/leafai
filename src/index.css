@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-leaf-50: #F0FFF0;
+  --color-leaf-100: #E8F5E9;
+  --color-leaf-200: #C8E6C9;
+  --color-leaf-300: #A5D6A7;
+  --color-leaf-400: #81C784;
+  --color-leaf-500: #66BB6A;
+  --color-leaf-600: #4CAF50;
+  --color-leaf-700: #43A047;
+  --color-leaf-800: #2E7D32;
+  --color-leaf-900: #1B5E20;
+  --color-cream-50: #FFFDF7;
+  --color-cream-100: #FFFDE7;
+  --color-cream-200: #FFF9C4;
+  --color-sun-300: #FFE082;
+  --color-sun-400: #FFD54F;
+  --color-sun-500: #FFCA28;
+  --color-orange-400: #FFB74D;
+  --color-orange-500: #FF9800;
+  --color-sky-100: #E0F7FA;
+  --color-sky-200: #B2EBF2;
+  --color-sky-300: #80DEEA;
+  --font-sans: 'ZCOOL KuaiLe', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  --font-body: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #333;
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: #C8E6C9;
+    color: #1B5E20;
+  }
+}

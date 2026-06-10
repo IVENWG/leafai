@@ -1,0 +1,79 @@
+.mascot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mascot-svg-wrapper {
+  filter: drop-shadow(0 4px 8px rgba(76, 175, 80, 0.2));
+}
+
+.mascot-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mascot-message {
+  background: white;
+  border: 2px solid #81C784;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  color: #2E7D32;
+  text-align: center;
+  max-width: 200px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.mascot-message::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #81C784;
+}
+
+/* Animations */
+.mascot-bounce {
+  animation: mascotBounce 2s ease-in-out infinite;
+}
+.mascot-wobble {
+  animation: mascotWobble 1.5s ease-in-out infinite;
+}
+.mascot-tilt {
+  animation: mascotTilt 2s ease-in-out infinite;
+}
+.mascot-jump {
+  animation: mascotJump 0.6s ease-in-out infinite;
+}
+.mascot-wave {
+  animation: mascotBounce 2s ease-in-out infinite;
+}
+
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes mascotWobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+@keyframes mascotTilt {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+@keyframes mascotJump {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  30% { transform: translateY(0) scaleY(0.9); }
+  50% { transform: translateY(-15px) scaleY(1.05); }
+  70% { transform: translateY(0) scaleY(0.95); }
+}

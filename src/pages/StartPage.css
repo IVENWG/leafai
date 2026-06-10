@@ -1,0 +1,148 @@
+.start-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding-top: 12px;
+}
+
+.start-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.start-sun {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  font-size: 2rem;
+  animation: sunGlow 3s ease-in-out infinite;
+}
+
+@keyframes sunGlow {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+.start-title {
+  font-size: 2rem;
+  color: #2E7D32;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  letter-spacing: 2px;
+}
+
+.start-subtitle {
+  font-size: 1.1rem;
+  color: #558B2F;
+  margin: 0;
+}
+
+.start-intro-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border: 2px solid #C8E6C9;
+  width: 100%;
+}
+
+.start-intro-text {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.8;
+  margin: 0;
+  text-align: center;
+}
+
+.start-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.start-info-item {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1.5px solid #E8F5E9;
+}
+
+.start-info-icon {
+  font-size: 1.5rem;
+}
+
+.start-info-label {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.start-info-value {
+  font-size: 0.75rem;
+  color: #2E7D32;
+  font-weight: 700;
+}
+
+.start-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.start-restore-card {
+  background: #FFF8E1;
+  border: 2px solid #FFD54F;
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  animation: slideUp 0.3s ease;
+}
+
+.start-restore-title {
+  font-size: 1rem;
+  color: #F57F17;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.start-restore-counts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.start-restore-count-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.start-restore-count-num {
+  font-weight: 700;
+  color: #F57F17;
+}
+
+.start-restore-actions {
+  display: flex;
+  gap: 12px;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
