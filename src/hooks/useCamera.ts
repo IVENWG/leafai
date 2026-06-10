@@ -44,6 +44,18 @@ export function useCamera(): UseCameraReturn {
     setIsReady(false);
   }, []);
 
+  // When the video element mounts after the stream is already obtained
+  // (e.g. cameraStarted flips to true → CameraView renders <video>),
+  // attach the pending stream automatically.
+  useEffect(() => {
+    const video = videoRef.current;
+    const stream = streamRef.current;
+    if (video && stream && !video.srcObject) {
+      video.srcObject = stream;
+      video.play().then(() => setIsReady(true));
+    }
+  });
+
   useEffect(() => {
     return () => {
       if (streamRef.current) {
