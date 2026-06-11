@@ -12,23 +12,23 @@
     0 0 0 3px #81C784;
 }
 
+/* Video always fills container, always visible.
+   Overlays (placeholder/error) sit on top with solid background when needed. */
 .camera-video {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  transform: scaleX(1);
-}
-
-.camera-video-active {
-  opacity: 1;
+  background: #F5F5F5;
 }
 
 .camera-placeholder,
 .camera-error {
   position: absolute;
   inset: 0;
+  background: #F5F5F5;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,6 +38,7 @@
   font-size: 1rem;
   text-align: center;
   padding: 24px;
+  z-index: 2;
 }
 
 .camera-loading-icon {
@@ -62,6 +63,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  z-index: 3;
 }
 
 .camera-guide-frame {

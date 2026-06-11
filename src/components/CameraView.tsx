@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import './CameraView.css';
 
 interface CameraViewProps {
@@ -13,13 +13,17 @@ interface CameraViewProps {
 export function CameraView({ videoRef, isReady, error, showGuide = true, started = true }: CameraViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Auto-fit video
-  }, [isReady]);
-
   return (
     <div className="camera-container" ref={containerRef}>
-      {/* Only show placeholder after user requested camera (not on initial mount) */}
+      {/* Video always rendered, fills container absolutely */}
+      <video
+        ref={videoRef}
+        className="camera-video"
+        playsInline
+        muted
+      />
+
+      {/* Placeholder covers video while camera is starting */}
       {!isReady && !error && started && (
         <div className="camera-placeholder">
           <div className="camera-loading-icon">📷</div>
@@ -27,18 +31,16 @@ export function CameraView({ videoRef, isReady, error, showGuide = true, started
           <p className="camera-hint">请允许浏览器访问摄像头</p>
         </div>
       )}
+
+      {/* Error covers video on failure */}
       {error && (
         <div className="camera-error">
           <div className="camera-error-icon">⚠️</div>
           <p>{error}</p>
         </div>
       )}
-      <video
-        ref={videoRef}
-        className={`camera-video ${isReady ? 'camera-video-active' : ''}`}
-        playsInline
-        muted
-      />
+
+      {/* Guide overlay on top of live feed */}
       {isReady && showGuide && (
         <div className="camera-guide-overlay">
           <div className="camera-guide-frame" />
