@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { flushSync } from 'react-dom';
 import { PageShell } from '../components/PageShell';
 import { CameraView } from '../components/CameraView';
 import { AppButton } from '../components/AppButton';
@@ -41,10 +40,8 @@ export function CollectPage({
   }, [sessionId, onCountsChange]);
 
   const handleStartCamera = useCallback(async () => {
-    // flushSync 强制同步渲染 <video> 元素，确保 videoRef.current 可用
-    // 同时保持在用户手势上下文内，iOS Safari 才允许 getUserMedia + play()
-    flushSync(() => setCameraStarted(true));
     await start();
+    setCameraStarted(true);
   }, [start]);
 
   const handleCapture = useCallback(async (label: LeafCategoryKey) => {
@@ -149,8 +146,19 @@ export function CollectPage({
           <p className="collect-subtitle">给AI看很多叶子照片，让它学会分类</p>
         </div>
 
-        {/* Camera */}
-        {!cameraStarted ? (
+        {/* CameraView is ALWAYS mounted so <video> ref is always available.
+            Before camera starts: gray box with invisible video.
+            After start: placeholder → live feed. */}
+        <CameraView
+          videoRef={videoRef}
+          isReady={isReady}
+          error={error}
+          showGuide
+          started={cameraStarted}
+        />
+
+        {/* Start button overlay — shown before camera opens */}
+        {!cameraStarted && !error && (
           <div className="collect-camera-start">
             <div className="collect-camera-icon">📷</div>
             <p>准备好摄像头，开始给AI看叶子</p>
@@ -158,10 +166,11 @@ export function CollectPage({
               打开摄像头
             </AppButton>
           </div>
-        ) : (
-          <>
-            <CameraView videoRef={videoRef} isReady={isReady} error={error} showGuide />
+        )}
 
+        {/* Controls — only shown after camera is started */}
+        {cameraStarted && (
+          <>
             {/* Photo tips */}
             <div className="collect-tips">
               <span className="collect-tip-icon">💡</span>

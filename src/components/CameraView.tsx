@@ -6,9 +6,11 @@ interface CameraViewProps {
   isReady: boolean;
   error: string | null;
   showGuide?: boolean;
+  /** Whether the user has requested camera start — controls placeholder visibility */
+  started?: boolean;
 }
 
-export function CameraView({ videoRef, isReady, error, showGuide = true }: CameraViewProps) {
+export function CameraView({ videoRef, isReady, error, showGuide = true, started = true }: CameraViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -17,7 +19,8 @@ export function CameraView({ videoRef, isReady, error, showGuide = true }: Camer
 
   return (
     <div className="camera-container" ref={containerRef}>
-      {!isReady && !error && (
+      {/* Only show placeholder after user requested camera (not on initial mount) */}
+      {!isReady && !error && started && (
         <div className="camera-placeholder">
           <div className="camera-loading-icon">📷</div>
           <p>正在打开摄像头…</p>

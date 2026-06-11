@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { flushSync } from 'react-dom';
 import { PageShell } from '../components/PageShell';
 import { CameraView } from '../components/CameraView';
 import { MascotBot } from '../components/MascotBot';
@@ -35,8 +34,8 @@ export function ChallengePage({ sessionId, onMistake, onCorrect, onBack, onRepor
   const [challengeCount, setChallengeCount] = useState(0);
 
   const handleStartCamera = useCallback(async () => {
-    flushSync(() => setCameraStarted(true));
     await start();
+    setCameraStarted(true);
   }, [start]);
 
   const handlePredict = useCallback(async () => {
@@ -110,17 +109,28 @@ export function ChallengePage({ sessionId, onMistake, onCorrect, onBack, onRepor
           <p className="challenge-subtitle">拿一片新的叶子，看看小叶AI能不能猜对</p>
         </div>
 
-        {!cameraStarted ? (
+        {/* CameraView is ALWAYS mounted so <video> ref is always available */}
+        <CameraView
+          videoRef={videoRef}
+          isReady={isReady}
+          error={error}
+          showGuide
+          started={cameraStarted}
+        />
+
+        {/* Start button — shown before camera opens */}
+        {!cameraStarted && !error && (
           <div className="challenge-camera-start">
             <MascotBot mood="happy" size={100} message="准备好了吗？" />
             <AppButton variant="primary" size="large" onClick={handleStartCamera} icon="📹">
               打开摄像头
             </AppButton>
           </div>
-        ) : (
-          <>
-            <CameraView videoRef={videoRef} isReady={isReady} error={error} showGuide />
+        )}
 
+        {/* Controls — shown after camera is started */}
+        {cameraStarted && (
+          <>
             {!result ? (
               <div className="challenge-action-area">
                 <p className="challenge-prompt">请把一片新的叶子放在摄像头前</p>

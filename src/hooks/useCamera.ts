@@ -39,17 +39,6 @@ export function useCamera(): UseCameraReturn {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-
-        // Wait for video metadata so the browser knows dimensions
-        await new Promise<void>((resolve) => {
-          const v = videoRef.current!;
-          if (v.readyState >= 1) {
-            resolve();
-            return;
-          }
-          v.addEventListener('loadedmetadata', () => resolve(), { once: true });
-        });
-
         await videoRef.current.play();
         setIsReady(true);
       }
@@ -68,20 +57,6 @@ export function useCamera(): UseCameraReturn {
     }
     setIsReady(false);
   }, []);
-
-  // When the video element mounts after the stream is already obtained
-  // (e.g. flushSync renders <video>, but start() hasn't attached yet),
-  // attach the pending stream automatically.
-  useEffect(() => {
-    const video = videoRef.current;
-    const stream = streamRef.current;
-    if (video && stream && !video.srcObject) {
-      video.srcObject = stream;
-      video.play()
-        .then(() => setIsReady(true))
-        .catch(() => {});
-    }
-  });
 
   // Safari auto-pauses muted videos that scroll out of viewport;
   // resume playback when they scroll back in.
