@@ -18,13 +18,12 @@ export function useCamera(): UseCameraReturn {
     try {
       setError(null);
 
-      // Stop any existing stream first
+      // Stop any existing stream
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(t => t.stop());
         streamRef.current = null;
       }
 
-      console.log('[useCamera] Requesting camera...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
@@ -34,31 +33,18 @@ export function useCamera(): UseCameraReturn {
         audio: false,
       });
       streamRef.current = stream;
-      console.log('[useCamera] Stream obtained, tracks:', stream.getTracks().map(t => `${t.kind}:${t.readyState}`).join(', '));
 
       const video = videoRef.current;
       if (!video) {
-        console.error('[useCamera] videoRef.current is NULL — <video> not mounted');
         setError('视频元素未就绪，请刷新页面重试');
         return;
       }
 
       video.srcObject = stream;
-      console.log('[useCamera] srcObject set, calling play()...');
-
-      // Race play() against a timeout so we don't hang forever
-      await Promise.race([
-        video.play(),
-        new Promise<never>((_, rej) =>
-          setTimeout(() => rej(new Error('播放超时，请检查浏览器是否允许自动播放')), 8000)
-        ),
-      ]);
-
-      console.log('[useCamera] play() resolved, marking ready');
+      await video.play();
       setIsReady(true);
     } catch (err: any) {
-      console.error('[useCamera] start() failed:', err);
-      setError(`摄像头启动失败: ${err?.name || ''} ${err?.message || '未知错误'}`);
+      setError(err?.message || '无法访问摄像头，请确保使用 HTTPS 并允许摄像头权限。');
     }
   }, []);
 

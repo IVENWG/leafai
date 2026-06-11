@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import './CameraView.css';
 
 interface CameraViewProps {
@@ -6,22 +5,14 @@ interface CameraViewProps {
   isReady: boolean;
   error: string | null;
   showGuide?: boolean;
-  /** Whether the user has requested camera start — controls placeholder visibility */
   started?: boolean;
 }
 
 export function CameraView({ videoRef, isReady, error, showGuide = true, started = true }: CameraViewProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   return (
-    <div className="camera-container" ref={containerRef}>
+    <div className="camera-container">
       {/* Video always rendered, fills container absolutely */}
-      <video
-        ref={videoRef}
-        className="camera-video"
-        playsInline
-        muted
-      />
+      <video ref={videoRef} className="camera-video" playsInline muted />
 
       {/* Placeholder covers video while camera is starting */}
       {!isReady && !error && started && (
