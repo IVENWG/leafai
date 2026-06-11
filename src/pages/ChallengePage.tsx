@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import { PageShell } from '../components/PageShell';
 import { CameraView } from '../components/CameraView';
 import { MascotBot } from '../components/MascotBot';
@@ -34,8 +35,8 @@ export function ChallengePage({ sessionId, onMistake, onCorrect, onBack, onRepor
   const [challengeCount, setChallengeCount] = useState(0);
 
   const handleStartCamera = useCallback(async () => {
+    flushSync(() => setCameraStarted(true));
     await start();
-    setCameraStarted(true);
   }, [start]);
 
   const handlePredict = useCallback(async () => {

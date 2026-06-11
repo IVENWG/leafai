@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import { PageShell } from '../components/PageShell';
 import { CameraView } from '../components/CameraView';
 import { AppButton } from '../components/AppButton';
@@ -40,8 +41,10 @@ export function CollectPage({
   }, [sessionId, onCountsChange]);
 
   const handleStartCamera = useCallback(async () => {
+    // flushSync 强制同步渲染 <video> 元素，确保 videoRef.current 可用
+    // 同时保持在用户手势上下文内，iOS Safari 才允许 getUserMedia + play()
+    flushSync(() => setCameraStarted(true));
     await start();
-    setCameraStarted(true);
   }, [start]);
 
   const handleCapture = useCallback(async (label: LeafCategoryKey) => {
