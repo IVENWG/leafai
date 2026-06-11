@@ -18,15 +18,13 @@ export function useCamera(): UseCameraReturn {
     try {
       setError(null);
 
-      // If a stream exists but its tracks are dead (e.g. strict mode remount),
-      // clear it so we get a fresh one
+      // Stop any existing stream first
       if (streamRef.current) {
-        const live = streamRef.current.getTracks().filter(t => t.readyState === 'live');
-        if (live.length === 0) {
-          streamRef.current = null;
-        }
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
       }
 
+      console.log('[useCamera] Requesting camera...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
@@ -36,19 +34,37 @@ export function useCamera(): UseCameraReturn {
         audio: false,
       });
       streamRef.current = stream;
+      console.log('[useCamera] Stream obtained, tracks:', stream.getTracks().map(t => `${t.kind}:${t.readyState}`).join(', '));
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        setIsReady(true);
+      const video = videoRef.current;
+      if (!video) {
+        console.error('[useCamera] videoRef.current is NULL — <video> not mounted');
+        setError('视频元素未就绪，请刷新页面重试');
+        return;
       }
+
+      video.srcObject = stream;
+      console.log('[useCamera] srcObject set, calling play()...');
+
+      // Race play() against a timeout so we don't hang forever
+      await Promise.race([
+        video.play(),
+        new Promise<never>((_, rej) =>
+          setTimeout(() => rej(new Error('播放超时，请检查浏览器是否允许自动播放')), 8000)
+        ),
+      ]);
+
+      console.log('[useCamera] play() resolved, marking ready');
+      setIsReady(true);
     } catch (err: any) {
-      setError(err?.message || '无法访问摄像头，请确保使用 HTTPS 并允许摄像头权限。');
+      console.error('[useCamera] start() failed:', err);
+      setError(`摄像头启动失败: ${err?.name || ''} ${err?.message || '未知错误'}`);
     }
   }, []);
 
   const stop = useCallback(() => {
     if (videoRef.current) {
+      videoRef.current.pause();
       videoRef.current.srcObject = null;
     }
     if (streamRef.current) {
@@ -58,8 +74,7 @@ export function useCamera(): UseCameraReturn {
     setIsReady(false);
   }, []);
 
-  // Safari auto-pauses muted videos that scroll out of viewport;
-  // resume playback when they scroll back in.
+  // Safari auto-pauses muted videos that scroll out of viewport
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -74,7 +89,7 @@ export function useCamera(): UseCameraReturn {
     return () => observer.disconnect();
   }, [isReady]);
 
-  // Cleanup on unmount: release camera and clear refs
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (videoRef.current) {

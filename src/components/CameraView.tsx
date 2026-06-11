@@ -36,7 +36,6 @@ export function CameraView({ videoRef, isReady, error, showGuide = true, started
       <video
         ref={videoRef}
         className={`camera-video ${isReady ? 'camera-video-active' : ''}`}
-        autoPlay
         playsInline
         muted
       />
