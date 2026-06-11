@@ -17,6 +17,16 @@ export function useCamera(): UseCameraReturn {
   const start = useCallback(async () => {
     try {
       setError(null);
+
+      // If a stream exists but its tracks are dead (e.g. strict mode remount),
+      // clear it so we get a fresh one
+      if (streamRef.current) {
+        const live = streamRef.current.getTracks().filter(t => t.readyState === 'live');
+        if (live.length === 0) {
+          streamRef.current = null;
+        }
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
@@ -26,8 +36,20 @@ export function useCamera(): UseCameraReturn {
         audio: false,
       });
       streamRef.current = stream;
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+
+        // Wait for video metadata so the browser knows dimensions
+        await new Promise<void>((resolve) => {
+          const v = videoRef.current!;
+          if (v.readyState >= 1) {
+            resolve();
+            return;
+          }
+          v.addEventListener('loadedmetadata', () => resolve(), { once: true });
+        });
+
         await videoRef.current.play();
         setIsReady(true);
       }
@@ -37,6 +59,9 @@ export function useCamera(): UseCameraReturn {
   }, []);
 
   const stop = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
       streamRef.current = null;
@@ -45,21 +70,44 @@ export function useCamera(): UseCameraReturn {
   }, []);
 
   // When the video element mounts after the stream is already obtained
-  // (e.g. cameraStarted flips to true → CameraView renders <video>),
+  // (e.g. flushSync renders <video>, but start() hasn't attached yet),
   // attach the pending stream automatically.
   useEffect(() => {
     const video = videoRef.current;
     const stream = streamRef.current;
     if (video && stream && !video.srcObject) {
       video.srcObject = stream;
-      video.play().then(() => setIsReady(true));
+      video.play()
+        .then(() => setIsReady(true))
+        .catch(() => {});
     }
   });
 
+  // Safari auto-pauses muted videos that scroll out of viewport;
+  // resume playback when they scroll back in.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && video.srcObject && video.paused) {
+        video.play().catch(() => {});
+      }
+    }, { threshold: 0.1 });
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [isReady]);
+
+  // Cleanup on unmount: release camera and clear refs
   useEffect(() => {
     return () => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
       }
     };
   }, []);
